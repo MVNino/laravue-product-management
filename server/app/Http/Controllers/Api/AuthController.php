@@ -4,16 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Dto\LoginUserDto;
 use App\Dto\RegisterUserDto;
+use App\Enums\HttpCode;
+use App\Enums\ResponseMessage;
+use App\Enums\TokenType;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Models\User;
 use App\Services\AuthService;
 use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -36,17 +33,17 @@ class AuthController extends Controller
 
             if (is_null($token)) {
                 return response()->json([
-                    'message'       => 'User not found',
-                ], 404);
+                    'message'       => ResponseMessage::USER_404,
+                ], HttpCode::NOT_FOUND);
             }
 
             return response()->json([
-                'message'       => 'Login success',
+                'message'       => ResponseMessage::LOGIN_SUCCESS,
                 'access_token'  => $token,
                 'token_type'    => 'Bearer'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], HttpCode::SERVER_ERROR);
         }
     }
 
@@ -59,13 +56,13 @@ class AuthController extends Controller
             [$user, $token] = $this->authService->register($registerUserDto);
 
             return response()->json([
-                'message' => 'User Registered',
+                'message' => ResponseMessage::USER_REGISTERED,
                 'data'          => $user,
                 'access_token'  => $token,
-                'token_type'    => 'Bearer'
+                'token_type'    => TokenType::BEARER
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], HttpCode::SERVER_ERROR);
         }
     }
 
@@ -74,8 +71,10 @@ class AuthController extends Controller
         $logoutUser = $this->authService->logout(auth('sanctum')->user());
 
         return response()->json([
-            'message' => $logoutUser ? 'Logout successfull' : 'Logout failed',
-            'status' => $logoutUser ? 200 : 400,
+            'message' => $logoutUser
+                ? ResponseMessage::LOGOUT_SUCCESS
+                : ResponseMessage::LOGOUT_FAILED,
+            'status' => $logoutUser ? HttpCode::OK : HttpCode::BAD_REQUEST,
         ]);
     }
 }

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Dto\ProductDto;
+use App\Enums\HttpCode;
+use App\Enums\Pagination;
+use App\Enums\ResponseMessage;
 use App\Http\Requests\ProductRequest;
 use App\Models\Product;
 use App\Services\ProductService;
@@ -24,12 +27,12 @@ class ProductController extends Controller
      */
     public function index(Request $request, Response $response): \Illuminate\Http\JsonResponse
     {
-        $limit = $request->query()['limit'] ?? 10;
-        $page = $request->query()['page'] ?? 1;
+        $limit = $request->query()['limit'] ?? Pagination::LIMIT_DEFAULT;
+        $page = $request->query()['page'] ?? Pagination::PAGE_DEFAULT;
 
         $products = $this->productService->findAll($page, $limit);
 
-        return response()->json($products);
+        return response()->json($products, HttpCode::OK);
     }
 
     /**
@@ -42,9 +45,12 @@ class ProductController extends Controller
 
             $product = $this->productService->create($productDto);
 
-            return response()->json(['data' => $product, 'message' => 'Created'], 201);
+            return response()->json(
+                ['data' => $product, 'message' => ResponseMessage::CREATED],
+                HttpCode::CREATED
+            );
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], HttpCode::SERVER_ERROR);
         }
     }
 
@@ -53,7 +59,7 @@ class ProductController extends Controller
      */
     public function show(Product $product): \Illuminate\Http\JsonResponse
     {
-        return response()->json(['data' => $product, 'message' => 'Find One']);
+        return response()->json(['data' => $product, 'message' => ResponseMessage::FIND_ONE]);
     }
 
     /**
@@ -66,9 +72,9 @@ class ProductController extends Controller
 
             $product = $this->productService->update($product, $productDto);
 
-            return response()->json(['data' => $product, 'message' => 'Updated']);
+            return response()->json(['data' => $product, 'message' => ResponseMessage::UPDATED]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], HttpCode::SERVER_ERROR);
         }
     }
 
@@ -79,6 +85,6 @@ class ProductController extends Controller
     {
         $product = $this->productService->destroy($product);
 
-        return response()->json(['data' => $product, 'message' => 'Deleted']);
+        return response()->json(['data' => $product, 'message' => ResponseMessage::DELETED]);
     }
 }
