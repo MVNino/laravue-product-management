@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api;
 
 use App\Dto\ProductDto;
 use App\Http\Requests\ProductRequest;
@@ -35,14 +35,16 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): \Illuminate\Http\JsonResponse
+    public function store(ProductRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $product = $this->productService->create($request->input());
+            $productDto = new ProductDto(...$request->validated());
+
+            $product = $this->productService->create($productDto);
 
             return response()->json(['data' => $product, 'message' => 'Created'], 201);
         } catch (Exception $e) {
-            return response()->json(['error' => $e], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -57,14 +59,16 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product): \Illuminate\Http\JsonResponse
+    public function update(ProductRequest $request, Product $product): \Illuminate\Http\JsonResponse
     {
         try {
-            $product = $this->productService->update($product, $request->input());
+            $productDto = new ProductDto(...$request->validated());
+
+            $product = $this->productService->update($product, $productDto);
 
             return response()->json(['data' => $product, 'message' => 'Updated']);
         } catch (Exception $e) {
-            return response()->json(['error' => $e], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 

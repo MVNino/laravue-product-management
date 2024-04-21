@@ -16,15 +16,10 @@ class ProductService
         return $products;
     }
 
-    // Put ProductDto in method arguments
-    public function create(array $productData): Product | Exception
+    public function create(ProductDto $productData): Product | Exception
     {
         try {
-            $product = Product::create([
-                'name' => $productData['name'],
-                'description' => $productData['description'],
-                'category' => $productData['category']
-            ]);
+            $product = Product::create($productData->toArray());
 
             return $product;
         } catch (Exception $e) {
@@ -41,12 +36,12 @@ class ProductService
         return $product;
     }
 
-    public function update(Product $product, array $productData): Product | null | Exception
+    public function update(Product $product, ProductDto $productData): Product | null | Exception
     {
         try {
-            $product->name = $productData['name'];
-            $product->description = $productData['description'];
-            $product->category = $productData['category'];
+            $product->name = $productData->name;
+            $product->description = $productData->description;
+            $product->category = $productData->category;
             $product->save();
 
             return $product;
