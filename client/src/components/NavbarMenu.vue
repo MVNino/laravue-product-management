@@ -8,7 +8,7 @@ import {
     <nav class="bg-gray-800 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center">
-                <a href="#" class="text-white text-xl font-semibold">LaraVue - Product CMS</a>
+                <a href="#" class="text-white text-xl font-semibold">LaraVue - Product</a>
             </div>
             <div class="hidden md:flex items-center space-x-4">
                 <NavigationMenuLink href="/" class="text-gray-300 hover:text-white">Home</NavigationMenuLink>
